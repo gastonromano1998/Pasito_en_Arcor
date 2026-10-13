@@ -499,6 +499,28 @@ select.name-in option{color:#141414}
 .aec-hero{margin:16px 14px 0;border-radius:20px;overflow:hidden;cursor:pointer;box-shadow:0 12px 26px -16px rgba(0,0,0,.5)}
 .aec-hero img{width:100%;aspect-ratio:3.6;object-fit:cover}
 .cats .cat{min-width:0}
+
+/* ---------- v6 modal + encuesta ---------- */
+.modal{position:absolute;inset:0;z-index:75;background:rgba(8,12,24,.62);display:grid;place-items:center;padding:20px;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+.modal.on{opacity:1;visibility:visible}
+.md-card{width:100%;max-width:360px;background:#fff;border-radius:28px;overflow:hidden;position:relative;transform:translateY(20px) scale(.96);transition:transform .45s var(--ease);box-shadow:0 30px 60px -20px rgba(0,0,0,.6)}
+.modal.on .md-card{transform:none}
+.md-x{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:15px;z-index:2}
+.md-banner img{width:100%;aspect-ratio:3.6;object-fit:cover}
+.md-body{padding:18px 20px 20px;text-align:center;position:relative}
+.md-logo{width:96px;height:52px;border-radius:14px;background:#fff;display:grid;place-items:center;margin:-46px auto 10px;box-shadow:0 10px 20px -10px rgba(0,0,0,.4)}
+.md-logo img{height:44px}
+.md-body h2{font-size:24px;font-weight:800;margin-top:10px;line-height:1.1}
+.md-body p{color:var(--muted);font-size:14.5px;margin-top:6px}
+.md-code{margin:14px 0 12px;padding:14px;border-radius:16px;border:2px dashed #c4161c;color:#c4161c;font-family:var(--num);font-weight:900;font-size:26px;letter-spacing:.08em;background:#fff3f3;user-select:all;-webkit-user-select:all}
+.pend{margin:12px 14px 0;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:18px;background:#fff;border:1.5px solid var(--lime-d);box-shadow:0 8px 20px -14px rgba(0,0,0,.4);cursor:pointer}
+.pend .pi{width:48px;height:48px;border-radius:12px;overflow:hidden;flex:none;background:#fff}
+.pend b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pend span{font-size:13px;color:var(--muted)}
+.canje-row{cursor:default}
+.canje-row[data-survey-past]{cursor:pointer}
+.rate{background:var(--lime);color:#2f3a00;font-weight:800;font-size:12.5px;padding:6px 10px;border-radius:99px;flex:none}
+.rated{color:var(--pri-t);font-weight:800;flex:none}
 </style>
 </head>
 <body>
@@ -540,6 +562,7 @@ select.name-in option{color:#141414}
   <div class="scrim" id="scrim"></div>
   <section class="sheet" id="sheet"></section>
   <div class="toast" id="toast"></div>
+  <div class="modal" id="modal"></div>
 </div>
 <div class="desk-note">Prototipo mobile de <b>Pasos que Suman</b>. Para la mejor experiencia, abrilo desde el celular escaneando el QR.</div>
 
@@ -619,7 +642,7 @@ function WEEK(){ return PROF==='vend'?[8500,9100,10400,9800,8800,7600]:[6400,720
 /* =====================================================================
    ESTADO
    ===================================================================== */
-var S = { tab:'home', pasitos:ME.pasitos, walk:0, walkPasitos:0, canjes:[], rankTab:'p', cat:'arcor', voted:null, tokinDone:false, sensor:'off', joined:{} };
+var S = { tab:'home', pasitos:ME.pasitos, walk:0, walkPasitos:0, canjes:[{key:'goat',local:'esquina',cost:32,when:'ayer 18:40',survey:true},{key:'chocotorta',local:'donpepe',cost:28,when:'lunes 12:15'}], rankTab:'p', cat:'arcor', voted:null, tokinDone:false, sensor:'off', joined:{} };
 function steps(){return ME.base + S.walk;}
 var fmt = new Intl.NumberFormat('es-AR');
 function f(n){return fmt.format(n);}
@@ -687,6 +710,8 @@ function benefitCard(key, lk){
 function renderHome(){
   var o='<div class="hdr-arc"><div class="arc-bar"><div class="arc-logo"><img src="'+IMG.arcorLogo+'" alt="Arcor"></div><div style="display:flex;gap:8px;align-items:center"><button class="ic-btn bell" data-open="notif" aria-label="Notificaciones">'+I.bell+'<i class="nbadge">3</i></button>'+chip()+avatarBtn()+'</div></div>';
   o+='<div class="arc-hero"><div class="hero-lbl"><span>PASOS DEL DÍA</span><span class="streak">'+ME.racha+' DÍAS 🔥</span></div><div class="hero-num"><span class="bignum steps-n" style="font-size:66px">'+f(steps())+'</span><small>/'+f(ME.goal)+'</small></div><div class="moons">'+weekMoons()+'</div></div></div>';
+  var pend=S.canjes.filter(function(x){return x.survey;})[0];
+  if(pend) o+='<div class="pend" data-survey-past="'+pend.key+'"><div class="pi">'+thumb(PRIZES[pend.key])+'</div><div style="flex:1;min-width:0"><b>¿Qué te pareció el '+esc(PRIZES[pend.key].name)+'?</b><span>Respondé y sumá +5 pasitos</span></div>'+I.chev+'</div>';
   o+='<div class="card goal"><h3>'+P.objetivo+'</h3><div class="bar"><i style="width:85%"></i></div><p>'+P.objTxt+' · faltan 3 días</p></div>';
   o+=walkCard();
   o+='<div class="aec-card" data-prize="aec" data-local="arcor"><div class="aec-l"><img src="'+IMG.encasa+'" alt="Arcor en Casa"></div><div class="aec-m"><b>10% OFF</b><span>en Arcor en Casa</span></div><div class="aec-r"><span>'+coin(true)+' 30</span><em>Canjear</em></div></div>';
@@ -817,9 +842,9 @@ function mapPage(){
 function profilePage(){
   var o='<div class="page-top"><button class="back" data-close aria-label="Volver">'+I.back+'</button><h1>Tu perfil</h1></div>';
   o+='<div class="card prof"><div class="avatar" style="width:70px;height:70px;font-size:22px">'+esc(ME.ini)+'</div><div style="flex:1"><h3>'+esc(ME.name)+'</h3><p>'+ME.role+'</p></div></div>';
-  o+='<div class="sec-h"><h2>Mis canjes</h2></div>';
+  o+='<div class="sec-h"><h2>Tus canjes</h2></div>';
   if(!S.canjes.length) o+='<div class="empty"><p>'+I.gift+' Todavía no canjeaste ningún premio.</p><a data-close data-tab="prem">Explorar premios</a></div>';
-  else S.canjes.slice().reverse().forEach(function(c){ var p=PRIZES[c.key]; o+='<div class="card canje-row"><div class="im">'+thumb(p)+'</div><div style="flex:1"><h4>'+esc(p.name)+'</h4><p>'+esc(LOCALS[c.local].name)+' · '+c.when+'</p><span class="cost" style="font-size:14px;margin-top:4px">Canjeado por '+coin(true)+' '+c.cost+'</span></div></div>'; });
+  else S.canjes.slice().reverse().forEach(function(c){ var p=PRIZES[c.key]; o+='<div class="card canje-row"'+(c.survey?' data-survey-past="'+c.key+'"':'')+'><div class="im">'+thumb(p)+'</div><div style="flex:1"><h4>'+esc(p.name)+'</h4><p>'+esc(LOCALS[c.local].name)+' · '+c.when+'</p><span class="cost" style="font-size:14px;margin-top:4px">Canjeado por '+coin(true)+' '+c.cost+'</span></div>'+(c.survey?'<span class="rate">Calificar</span>':'<span class="rated">✓</span>')+'</div>'; });
   o+='<div class="sec-h"><h2>Más</h2></div>';
   o+='<div class="set-row" data-open="poll">'+I.poll+' Encuesta: ¿te sumarías?<span class="r">'+(S.voted?'Votaste ✓':'')+'</span></div>';
   o+='<div class="set-row" data-open="about">'+I.info+' Sobre este prototipo</div>';
@@ -868,11 +893,14 @@ function redeem(key, lk){
   o+='<button class="btn ghost" style="margin-top:10px" data-close-sheet>Listo</button>';
   openSheet(o);
 }
-function surveySheet(key){
-  var p=PRIZES[key];
-  var o='<div class="sh-head" style="margin-top:56px"><div class="sh-img">'+thumb(p)+'</div><span class="sh-cost">Canjeado ✓</span></div><h2>¿Qué te pareció el '+esc(p.name)+'?</h2><div class="where">Lanzamiento · tu opinión llega al equipo de producto</div>';
-  o+='<div style="margin-top:16px;font-weight:700">¿Qué destacarías? <span class="muted" style="font-weight:500">(opcional)</span></div><div class="qa"><button>Sabor</button><button>Tamaño</button><button>Precio</button><button>Packaging</button><button>Lo volvería a comprar</button></div>';
-  o+='<div style="display:flex;gap:10px;margin-top:18px"><button class="btn" data-like="1">Me gustó</button><button class="btn ghost" data-like="0">No me gustó</button></div>';
+function surveySheet(key, past){
+  var p=PRIZES[key], c=past?S.canjes.filter(function(x){return x.key===key&&x.survey;})[0]:null;
+  var o='<div class="sh-head" style="margin-top:56px"><div class="sh-img">'+thumb(p)+'</div><span class="sh-cost">Canjeado por '+coin(true)+' '+(c?c.cost:priceFor(key,'arcor'))+'</span></div>';
+  o+='<h2>'+esc(p.name)+'</h2><div class="where">Lanzamiento'+(c?' · lo canjeaste '+c.when+' en '+esc(LOCALS[c.local].name):'')+'</div>';
+  o+='<p class="desc" style="margin-top:14px;font-weight:600">¿Qué te pareció? Tu opinión llega directo al equipo de producto de Arcor.</p>';
+  o+='<div style="margin-top:12px;font-weight:700">¿Qué destacarías? <span class="muted" style="font-weight:500">(opcional)</span></div><div class="qa"><button>Sabor</button><button>Tamaño</button><button>Precio</button><button>Packaging</button><button>Lo volvería a comprar</button></div>';
+  o+='<div style="display:flex;gap:10px;margin-top:18px"><button class="btn" data-like="1" data-key="'+key+'">Me gustó</button><button class="btn ghost" data-like="0" data-key="'+key+'">No me gustó</button></div>';
+  o+='<p class="center muted" style="font-size:13px;margin-top:10px">Respondé y sumás +5 pasitos</p>';
   openSheet(o);
 }
 function challengeSheet(i){
@@ -919,7 +947,7 @@ function setTab(t){
   RENDER[t](); var v=$('#v-'+t); v.classList.add('on'); v.scrollTop=0;
 }
 document.addEventListener('click',function(e){
-  var el=e.target.closest('[data-tab],[data-open],[data-prize],[data-local],[data-close],[data-close-sheet],[data-toast],[data-rank],[data-cat],[data-chal],[data-join],[data-redeem],[data-survey],[data-like],[data-vote],#btn-sensor,#btn-sim,#tokin-go,#reset,.qa button');
+  var el=e.target.closest('[data-tab],[data-open],[data-prize],[data-local],[data-close],[data-close-sheet],[data-toast],[data-rank],[data-cat],[data-chal],[data-join],[data-redeem],[data-survey],[data-survey-past],[data-copy],[data-modal-close],[data-like],[data-vote],#btn-sensor,#btn-sim,#tokin-go,#reset,.qa button');
   if(!el) return;
   var d=el.dataset;
   if(el.matches('.qa button')){ el.classList.toggle('sel'); return; }
@@ -928,8 +956,11 @@ document.addEventListener('click',function(e){
   if(el.id==='tokin-go'){ S.tokinDone=true; S.pasitos+=50; bumpPasitos(); confetti(); toast(coin(true)+' +50 pasitos · ¡Comercio asociado a Tokin!'); closeSheet(); return; }
   if(el.id==='reset'){ location.reload(); return; }
   if(d.redeem){ redeem(d.redeem,d.local); return; }
+  if(d.copy){ copyText(d.copy); return; }
+  if(d.modalClose!==undefined){ closeModal(); return; }
   if(d.survey){ surveySheet(d.survey); return; }
-  if(d.like!==undefined){ S.pasitos+=5; bumpPasitos(); toast(coin(true)+' +5 pasitos · ¡Gracias por tu opinión!'); closeSheet(); return; }
+  if(d.surveyPast){ closePage(); surveySheet(d.surveyPast, true); return; }
+  if(d.like!==undefined){ S.canjes.forEach(function(x){ if(x.key===d.key) x.survey=false; }); if(S.tab==='home') renderHome(); S.pasitos+=5; bumpPasitos(); toast(coin(true)+' +5 pasitos · ¡Gracias por tu opinión!'); closeSheet(); return; }
   if(d.vote){ S.voted=+d.vote; pollSheet(); if(S.tab==='home') renderHome(); toast('¡Gracias por votar!'); return; }
   if(d.join){ S.joined[+d.join]=true; closeSheet(); toast('¡Te sumaste al desafío!'); if(S.tab==='home') renderHome(); return; }
   if(d.prize){ prizeSheet(d.prize, d.local||'arcor'); return; }
@@ -944,6 +975,20 @@ document.addEventListener('click',function(e){
   if(d.toast){ toast(d.toast); return; }
 });
 
+function welcomeModal(){
+  var m=$('#modal');
+  m.innerHTML='<div class="md-card"><button class="md-x" data-modal-close aria-label="Cerrar">✕</button><div class="md-banner"><img src="'+IMG.bMama+'" alt="Para Mamá, algo rico · Arcor en Casa"></div>'+
+    '<div class="md-body"><div class="md-logo"><img src="'+IMG.encasa+'" alt="Arcor en Casa"></div><span class="tag lime">Regalo de bienvenida</span><h2>$10.000 OFF en Arcor en Casa</h2><p>Para sorprender a mamá. Usá este cupón en tu compra en arcorencasa.com.</p>'+
+    '<div class="md-code" id="md-code">AEC.MAMÁ</div><button class="btn" data-copy="AEC.MAMÁ">Copiar cupón</button><button class="btn ghost" style="margin-top:8px" data-modal-close>Seguir a Pasito</button></div></div>';
+  m.classList.add('on');
+}
+function closeModal(){ var m=$('#modal'); if(!m.classList.contains('on')) return; m.classList.remove('on');
+  setTimeout(function(){ var pend=S.canjes.filter(function(x){return x.survey;})[0]; if(pend && !sheet.classList.contains('on')) surveySheet(pend.key,true); },1200); }
+function copyText(t){
+  var ok=function(){ toast('Cupón '+t+' copiado'); };
+  try{ navigator.clipboard.writeText(t).then(ok,function(){ selectCode(); }); }catch(e){ selectCode(); }
+  function selectCode(){ var el=$('#md-code'); if(!el) return; var r=document.createRange(); r.selectNodeContents(el); var sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r); toast('Mantené presionado el código para copiarlo'); }
+}
 var tt;
 function toast(html){ var t=$('#toast'); t.innerHTML=html; t.classList.add('on'); clearTimeout(tt); tt=setTimeout(function(){t.classList.remove('on');},2300); }
 function confetti(){ var app=$('#app'), cs=['#e9f55c','#f8c6ef','#3b6ae0','#1446a0','#f7d36b'];
@@ -1008,9 +1053,11 @@ $('#enter').onclick=function(){
   if(n){ ME.name=n; var p=n.split(/\s+/); ME.ini=(p[0][0]+(p[1]?p[1][0]:(p[0][1]||''))).toUpperCase(); }
   applyProfile(pickProf, $('#grp').value);
   setTab('home'); $('#splash').classList.add('out'); setTimeout(function(){$('#splash').style.display='none';},500);
+  setTimeout(welcomeModal,900);
 };
 $('#nm').addEventListener('keydown',function(e){ if(e.key==='Enter') $('#nm').blur(); });
 </script>
+
 
 
 
