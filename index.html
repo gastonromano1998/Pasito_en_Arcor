@@ -246,7 +246,7 @@ img{display:block;max-width:100%}
 
 /* ---------- rewards ---------- */
 .map-top{height:200px;position:relative;overflow:hidden}
-.map-top svg{position:absolute;inset:0;width:100%;height:100%}
+.map-top>svg{position:absolute;inset:0;width:100%;height:100%}
 .map-top .hdr{position:absolute;top:calc(28px + var(--safe-t));left:14px;right:14px;display:flex;justify-content:space-between;align-items:center}
 .map-top .hdr .wordmark{color:var(--pri-t)}
 .explore{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:#fff;padding:12px 20px;border-radius:99px;font-weight:700;font-size:16px;box-shadow:0 10px 24px -12px rgba(0,0,0,.45);white-space:nowrap}
@@ -479,6 +479,26 @@ select.name-in option{color:#141414}
 .tk-shot{margin-top:16px}
 .tk-shot img{border-radius:14px;box-shadow:0 8px 20px -12px rgba(0,0,0,.5)}
 .ben .im,.prz-card .im,.sh-img,.canje-row .im{background:#fff}
+
+/* ---------- v5 ---------- */
+.proto{top:auto;bottom:calc(88px + var(--safe-b));opacity:.85}
+.explore svg{flex:none;display:block}
+.explore span{line-height:1}
+.aec-card{margin:14px 14px 0;display:flex;align-items:center;gap:14px;padding:14px;border-radius:22px;cursor:pointer;
+  background:linear-gradient(120deg,#e52b3b,#c4161c);color:#fff;box-shadow:0 14px 28px -16px rgba(196,22,28,.7);position:relative;overflow:hidden}
+.aec-card::after{content:"";position:absolute;right:-30px;top:-40px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.1)}
+.aec-l{width:76px;height:48px;border-radius:12px;background:#fff;display:grid;place-items:center;flex:none}
+.aec-l img{height:40px}
+.aec-m{flex:1;min-width:0}
+.aec-m b{display:block;font-family:var(--num);font-size:28px;font-weight:900;line-height:1}
+.aec-m span{font-size:14px;opacity:.9}
+.aec-r{display:flex;flex-direction:column;align-items:flex-end;gap:6px;position:relative;z-index:1}
+.aec-r span{display:inline-flex;align-items:center;gap:4px;font-weight:800;font-size:15px}
+.aec-r .pcoin{background:#fff;color:#c4161c}
+.aec-r em{font-style:normal;background:var(--lime);color:#2f3a00;font-weight:800;font-size:13.5px;padding:7px 12px;border-radius:99px}
+.aec-hero{margin:16px 14px 0;border-radius:20px;overflow:hidden;cursor:pointer;box-shadow:0 12px 26px -16px rgba(0,0,0,.5)}
+.aec-hero img{width:100%;aspect-ratio:3.6;object-fit:cover}
+.cats .cat{min-width:0}
 </style>
 </head>
 <body>
@@ -559,7 +579,7 @@ function applyProfile(prof, group){
   ME.goal=P.goal; ME.base=P.base; ME.prom=P.prom; ME.rankBase=P.rankBase;
   var mine=P.pairs.filter(function(x){return x.indexOf(ME.team)>=0;}), rest=P.pairs.filter(function(x){return x.indexOf(ME.team)<0;});
   CHALLENGES=mine.concat(rest).map(function(x,i){ return {t:x[0]+' vs '+x[1], a:x[0], b:x[1], pa:P.pct[x[0]], pb:P.pct[x[1]], c:['#9ec5f7','#b9d6fb','#a6c7f5','#c9dcff'][i%4], mine:x.indexOf(ME.team)>=0}; });
-  S.rankTab='p';
+  S.rankTab='p'; S.cat = prof==='vend'?'com':'aec';
 }
 var CHALLENGES=[];
 var COLORS=['#f29d4b','#7d5cf0','#e2558f','#3b8fe0','#2fae7a','#d9a23b','#5b6ee8','#e46d4f','#3fb0b8'];
@@ -575,17 +595,24 @@ var PRIZES = {
   fram_choc:    {name:'Frambuesas Bañadas', sub:'Aguila · Chocolate con leche', cost:70, img:IMG.fram_choc, stock:6, desc:'Frambuesas bañadas en chocolate con leche, en pote de 150 g.'},
   aguila60:     {name:'Aguila Amargo 60%', sub:'Extra fino', cost:55, img:IMG.aguila60, stock:8, desc:'Tableta de chocolate amargo Aguila extra fino, 60% cacao.'},
   bonobon_dubai:{name:'bon o bon Dubai', sub:'Caja de bombones de pistacho', cost:90, img:IMG.bonobon_dubai, stock:5, desc:'Caja de bombones bon o bon Dubai, sabor pistacho. Ideal para regalar.'},
-  aec:          {name:'Cupón Arcor en Casa', sub:'15% en tu primera compra online', cost:60, logo:IMG.encasa, coupon:true, stock:99, desc:'Un cupón de bienvenida para tu primera compra en arcorencasa.com. Envíos a todo el país.'},
+  aec:          {name:'Cupón 10% OFF', sub:'En tu compra en Arcor en Casa', cost:30, logo:IMG.encasa, coupon:true, stock:99, desc:'Un cupón de 10% de descuento para tu próxima compra en arcorencasa.com. Envíos a todo el país.'},
   latte:        {name:'Latte grande', sub:'Café de especialidad', cost:65, tile:['#7a4b2a','☕','LATTE'], stock:8, desc:'Un latte grande para llevar o tomar ahí.'},
   clase:        {name:'Clase de prueba', sub:'Funcional o yoga', cost:80, tile:['#5b4ee0','🧘','CLASE'], stock:6, desc:'Una clase de prueba en el horario que elijas.'}
 };
 var LOCALS = {
-  arcor:   {name:'Grupo Arcor', type:'Productos Arcor', addr:'Palermo', km:'2.0 km', cover:IMG.products, logo:IMG.arcorLogo, social:'+20 mil ya canjearon premios acá', prizes:['goat','cofler_dubai','ramen','aguila_dubai','chocotorta','fram_pist','fram_choc','aguila60','bonobon_dubai','aec'], arcor:true},
-  esquina: {name:'Kiosco La Esquina', type:'Kiosco', addr:'Av. Corrientes 2450', km:'0.6 km', emoji:'🏪', color:'#e9a23b', social:'+300 ya canjearon acá', prizes:['cofler_dubai','chocotorta','ramen'], clubgo:true},
-  dontito: {name:'Almacén Don Tito', type:'Almacén', addr:'Av. Boyacá 980', km:'1.1 km', emoji:'🛒', color:'#3fae6a', social:'+180 ya canjearon acá', prizes:['goat','aguila_dubai','chocotorta'], clubgo:true},
+  arcor:   {name:'Arcor en Casa', type:'Tienda online de Arcor', addr:'arcorencasa.com', km:'Online', cover:IMG.products, logo:IMG.encasa, social:'+20 mil ya canjearon premios acá', prizes:['aec','goat','cofler_dubai','ramen','aguila_dubai','chocotorta','fram_pist','fram_choc','aguila60','bonobon_dubai'], arcor:true, online:true},
+  donpepe: {name:'Kiosco Don Pepe', type:'Kiosco', addr:'Av. Scalabrini Ortiz 1320', km:'0.4 km', emoji:'🍬', color:'#e2558f', social:'+520 ya canjearon acá', prizes:['cofler_dubai','chocotorta','ramen'], clubgo:true},
+  open25:  {name:'Open 25', type:'Cadena de tiendas de conveniencia', addr:'Av. Santa Fe 3500', km:'0.8 km', txt:'OPEN<br>25', color:'#1f8a8a', social:'+1.200 ya canjearon acá', prizes:['ramen','aguila_dubai','goat','chocotorta']},
+  esquina: {name:'Kiosco La Esquina', type:'Kiosco', addr:'Av. Corrientes 2450', km:'0.6 km', emoji:'🏪', color:'#e9a23b', social:'+300 ya canjearon acá', prizes:['cofler_dubai','chocotorta'], clubgo:true},
+  dontito: {name:'Almacén Don Tito', type:'Almacén', addr:'Av. Boyacá 980', km:'1.1 km', emoji:'🛒', color:'#3fae6a', social:'+180 ya canjearon acá', prizes:['goat','aguila_dubai'], clubgo:true},
+  maxisol: {name:'Maxikiosco Sol', type:'Maxikiosco', addr:'Av. Rivadavia 5100', km:'1.4 km', emoji:'☀️', color:'#f2a51a', social:'+410 ya canjearon acá', prizes:['goat','cofler_dubai']},
+  puente:  {name:'Autoservicio El Puente', type:'Autoservicio', addr:'Av. Juan B. Justo 2200', km:'1.9 km', emoji:'🧺', color:'#5b6ee8', social:'+260 ya canjearon acá', prizes:['ramen','aguila60','fram_pist']},
+  kiosco24:{name:'Kiosco 24 Hs Villa Crespo', type:'Kiosco 24 hs', addr:'Av. Corrientes 5100', km:'2.2 km', emoji:'🌙', color:'#3a3f8f', social:'+340 ya canjearon acá', prizes:['chocotorta','goat'], clubgo:true},
+  poliana: {name:'Polirrubro Ana', type:'Polirrubro', addr:'Av. Gaona 2100', km:'2.6 km', emoji:'🎁', color:'#c9562f', social:'+150 ya canjearon acá', prizes:['aguila_dubai','cofler_dubai']},
   cafe:    {name:'Café Plaza', type:'Café de especialidad', addr:'Plaza Irlanda', km:'1.6 km', emoji:'☕', color:'#7a4b2a', social:'+400 ya canjearon acá', prizes:['latte']},
   pulso:   {name:'Estudio Pulso', type:'Gimnasio', addr:'Av. Gaona 1800', km:'2.4 km', emoji:'🏋️', color:'#5b4ee0', social:'+250 ya canjearon acá', prizes:['clase']}
 };
+var COMERCIOS = { vend:['donpepe','open25','esquina','dontito','maxisol','puente','kiosco24','poliana'], emp:['open25','donpepe','esquina','maxisol'] };
 var CLUBGO_OFF = 0.2;
 function WEEK(){ return PROF==='vend'?[8500,9100,10400,9800,8800,7600]:[6400,7200,8600,5900,9100,7400]; }
 
@@ -615,6 +642,8 @@ var I = {
   info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>',
   poll:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M11 20V5M17 20v-8M3 20h18"/></svg>',
   reset:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:#d33b2c"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.6"/><path d="M4 4v4.6h4.6"/></svg>',
+  bag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>',
+  star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>',
   lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'
 };
 function coin(sm){return '<span class="pcoin'+(sm?' sm':'')+'">P</span>';}
@@ -625,6 +654,7 @@ function thumb(p){
 }
 function localLogo(l){
   if(l.logo) return '<img src="'+l.logo+'" alt="'+esc(l.name)+'" style="width:84%">';
+  if(l.txt) return '<div class="tile" style="background:'+l.color+';font-size:20px;font-family:var(--num);font-weight:900;letter-spacing:.02em">'+l.txt+'</div>';
   return '<div class="tile" style="background:'+l.color+';font-size:40px">'+l.emoji+'</div>';
 }
 function priceFor(key, lk){ var p=PRIZES[key], l=LOCALS[lk]; return (l&&l.clubgo)?Math.round(p.cost*(1-CLUBGO_OFF)):p.cost; }
@@ -659,6 +689,7 @@ function renderHome(){
   o+='<div class="arc-hero"><div class="hero-lbl"><span>PASOS DEL DÍA</span><span class="streak">'+ME.racha+' DÍAS 🔥</span></div><div class="hero-num"><span class="bignum steps-n" style="font-size:66px">'+f(steps())+'</span><small>/'+f(ME.goal)+'</small></div><div class="moons">'+weekMoons()+'</div></div></div>';
   o+='<div class="card goal"><h3>'+P.objetivo+'</h3><div class="bar"><i style="width:85%"></i></div><p>'+P.objTxt+' · faltan 3 días</p></div>';
   o+=walkCard();
+  o+='<div class="aec-card" data-prize="aec" data-local="arcor"><div class="aec-l"><img src="'+IMG.encasa+'" alt="Arcor en Casa"></div><div class="aec-m"><b>10% OFF</b><span>en Arcor en Casa</span></div><div class="aec-r"><span>'+coin(true)+' 30</span><em>Canjear</em></div></div>';
   o+='<div class="sec-h"><h2>'+(PROF==='vend'?'Desafíos entre equipos':'Desafíos entre áreas')+'</h2><a data-tab="third">Ver ranking</a></div><div class="hscroll">';
   CHALLENGES.forEach(function(c,i){ o+='<div class="chal'+(c.mine?' mine':'')+'" data-chal="'+i+'">'+(c.mine?'<span class="yours">Tu equipo</span>':'')+'<div class="t">'+c.t+'</div><div class="stack">'+av(c.a[0],i)+av(c.b[0],i+3)+av('+',i+5)+'</div><div class="b" style="background:'+c.c+'">'+(S.joined[i]?'✓ Te sumaste':(c.mine?'🏆 Sumá tus pasos':'👀 Ver desafío'))+'</div></div>'; });
   o+='</div>';
@@ -734,13 +765,20 @@ function mapSvg(dim){
   return o+'</svg>';
 }
 function renderPrem(){
-  var o='<div class="map-top">'+mapSvg(true)+'<div class="hdr">'+chip()+'<div class="arc-logo"><img src="'+IMG.arcorLogo+'" alt="Arcor"></div>'+avatarBtn()+'</div><button class="explore" data-open="map">'+I.map+' Explorar el mapa</button></div>';
-  o+='<div class="cats"><button class="cat'+(S.cat==='arcor'?' on':'')+'" data-cat="arcor">'+I.arcor+'Arcor</button><button class="cat'+(S.cat==='red'?' on':'')+'" data-cat="red">'+I.store+'Otros beneficios</button></div>';
-  var keys = S.cat==='arcor' ? ['arcor','esquina','dontito'] : ['cafe','pulso'];
-  if(S.cat==='arcor') o+='<div class="cg-info"><span class="clubgo" style="margin:0">★ CLUB GO</span><span>Los PDV Club Go tienen <b>20% menos pasitos</b> en sus canjes.</span></div>';
-  keys.forEach(function(k){ var l=LOCALS[k];
-    o+='<div class="card loc" data-local="'+k+'"><div class="top"><div class="lg">'+localLogo(l)+'</div><div style="flex:1;min-width:0"><h4>'+esc(l.name)+'</h4><div class="ty">'+esc(l.type)+'</div><div class="ad">'+I.pin+' '+esc(l.addr)+'</div><div class="op"><b>Abierto</b> · '+l.km+'</div>'+(l.clubgo?'<span class="clubgo">★ CLUB GO · -20% en canjes</span>':'')+'</div></div>'+
-      '<div class="prz-row">'+l.prizes.map(function(p){return '<span>'+esc(PRIZES[p].name)+' · '+priceFor(p,k)+' pasitos</span>';}).join('')+'</div></div>'; });
+  var o='<div class="map-top">'+mapSvg(true)+'<div class="hdr">'+chip()+avatarBtn()+'</div><button class="explore" data-open="map">'+I.map+'<span>Explorar el mapa</span></button></div>';
+  var cats=[['aec','Arcor en Casa',I.bag],['com','Comercios',I.store],['otros','Otros',I.star]];
+  o+='<div class="cats">'+cats.map(function(c){return '<button class="cat'+(S.cat===c[0]?' on':'')+'" data-cat="'+c[0]+'">'+c[2]+c[1]+'</button>';}).join('')+'</div>';
+  if(S.cat==='aec'){
+    o+='<div class="aec-hero" data-local="arcor"><img src="'+IMG.bMama+'" alt="Arcor en Casa"></div>';
+    o+='<div class="sec-h"><h2>Canjeá en Arcor en Casa</h2><a data-local="arcor">Ver todo</a></div>';
+    o+=['aec','cofler_dubai','goat','ramen','aguila_dubai','bonobon_dubai'].map(function(k){return prizeCard(k,'arcor');}).join('');
+  } else {
+    var keys = S.cat==='com' ? COMERCIOS[PROF] : ['cafe','pulso'];
+    if(S.cat==='com') o+='<div class="cg-info"><span class="clubgo" style="margin:0">★ CLUB GO</span><span>Los PDV Club Go tienen <b>20% menos pasitos</b> en sus canjes.</span></div>';
+    keys.forEach(function(k){ var l=LOCALS[k];
+      o+='<div class="card loc" data-local="'+k+'"><div class="top"><div class="lg">'+localLogo(l)+'</div><div style="flex:1;min-width:0"><h4>'+esc(l.name)+'</h4><div class="ty">'+esc(l.type)+'</div><div class="ad">'+I.pin+' '+esc(l.addr)+'</div><div class="op"><b>Abierto</b> · '+l.km+'</div>'+(l.clubgo?'<span class="clubgo">★ CLUB GO · -20% en canjes</span>':'')+'</div></div>'+
+        '<div class="prz-row">'+l.prizes.map(function(p){return '<span>'+esc(PRIZES[p].name)+' · '+priceFor(p,k)+' pasitos</span>';}).join('')+'</div></div>'; });
+  }
   $('#v-prem').innerHTML=o;
 }
 function prizeCard(key, lk){
@@ -755,23 +793,24 @@ var pg=$('#pg');
 function openPage(html, cls){ pg.className='page'+(cls?' '+cls:''); pg.innerHTML=html; pg.scrollTop=0; requestAnimationFrame(function(){pg.classList.add('on');}); }
 function closePage(){ pg.classList.remove('on'); }
 function localPage(k){
-  var l=LOCALS[k], o='<div class="lp-cover">'+(l.cover?'<img src="'+l.cover+'" alt="">':'<div class="tile" style="background:'+l.color+';font-size:110px;opacity:.9">'+l.emoji+'</div>')+'<button class="back" data-close aria-label="Volver">'+I.back+'</button><span class="open">ABIERTO AHORA</span></div>';
-  o+='<div class="lp-logo">'+localLogo(l)+'</div><div class="lp-info"><div class="muted" style="text-align:right;margin-top:-44px">Estás a <b>'+l.km+'</b></div><h1 style="margin-top:20px">'+esc(l.name)+'</h1><div class="ty">'+esc(l.type)+' · '+I.pin+' '+esc(l.addr)+'</div>';
+  var l=LOCALS[k], o='<div class="lp-cover">'+(l.cover?'<img src="'+l.cover+'" alt="">':'<div class="tile" style="background:'+l.color+';font-size:110px;opacity:.9">'+l.emoji+'</div>')+'<button class="back" data-close aria-label="Volver">'+I.back+'</button><span class="open">'+(l.online?'ENVÍOS A TODO EL PAÍS':'ABIERTO AHORA')+'</span></div>';
+  o+='<div class="lp-logo">'+localLogo(l)+'</div><div class="lp-info"><div class="muted" style="text-align:right;margin-top:-44px">'+(l.online?'<b>Tienda online</b>':'Estás a <b>'+l.km+'</b>')+'</div><h1 style="margin-top:20px">'+esc(l.name)+'</h1><div class="ty">'+esc(l.type)+' · '+I.pin+' '+esc(l.addr)+'</div>';
   if(l.clubgo) o+='<span class="clubgo" style="margin-top:10px">★ CLUB GO · 20% menos pasitos en todos los canjes</span>';
-  o+='<div class="soc"><span class="stack" style="margin:0">'+av('R',1)+av('A',2)+av('M',3)+'</span>'+esc(l.social)+'</div><h2 style="font-size:22px;font-weight:600;margin-top:22px">Premios disponibles</h2></div>';
+  o+='<div class="soc"><span class="stack" style="margin:0">'+av('R',1)+av('A',2)+av('M',3)+'</span>'+esc(l.social)+'</div><h2 style="font-size:22px;font-weight:600;margin-top:22px">'+(l.online?'Canjeá y te lo enviamos':'Premios disponibles')+'</h2></div>';
   o+=l.prizes.map(function(p){return prizeCard(p,k);}).join('');
   if(l.clubgo && PROF==='vend') o+='<div class="card tokin-card" data-open="tokin" style="margin-top:18px"><img src="'+IMG.tokin+'" alt="Tokin"><div style="flex:1"><h4>¿Este comercio tiene Tokin?</h4><p>Asocialo ahora y sumá un bonus.</p></div>'+I.chev+'</div>';
   openPage(o);
 }
 function mapPage(){
-  var pins=[['arcor',28,22,1],['esquina',62,34,0],['dontito',22,48,0],['arcor',78,58,1],['cafe',48,18,0],['pulso',70,12,0]];
+  var pos=[[26,20],[62,32],[20,46],[80,52],[46,16],[70,10],[36,60],[84,24],[14,30]], ks=COMERCIOS[PROF].concat(['cafe']);
+  var pins=ks.map(function(k,i){return [k,pos[i][0],pos[i][1],0];});
   var o='<div class="map-full">'+mapSvg(false)+'</div>';
   pins.forEach(function(p){ var l=LOCALS[p[0]];
-    o+='<div class="pin'+(p[3]?' arc':'')+'" style="left:'+p[1]+'%;top:'+(p[2]+12)+'%" data-local="'+p[0]+'"><div class="h">'+(p[3]?'<img src="'+IMG.arcorLogo+'" alt="Arcor">':l.emoji)+'</div>'+(l.clubgo?'<span class="lbl">Club Go</span>':'')+'</div>'; });
+    o+='<div class="pin'+(p[3]?' arc':'')+'" style="left:'+p[1]+'%;top:'+(p[2]+12)+'%" data-local="'+p[0]+'"><div class="h" style="'+(l.txt?'background:'+l.color:'')+'">'+(l.emoji||'<b style="font-size:10px;color:#fff;line-height:1;text-align:center">'+l.txt+'</b>')+'</div>'+(l.clubgo?'<span class="lbl">Club Go</span>':'')+'</div>'; });
   o+='<div class="me-dot" style="left:50%;top:44%"></div>';
   o+='<div class="map-search"><button class="back" data-close style="background:#fff" aria-label="Volver">'+I.back+'</button><div class="s">'+I.search+' Buscar locales y premios</div></div>';
   o+='<div class="map-sheet"><div class="grab"></div><h3 style="font-size:20px;font-weight:600;padding:0 18px">Más cerca tuyo</h3>';
-  ['esquina','dontito','arcor'].forEach(function(k){ var l=LOCALS[k];
+  COMERCIOS[PROF].slice(0,3).forEach(function(k){ var l=LOCALS[k];
     o+='<div class="card loc" data-local="'+k+'" style="margin-top:10px"><div class="top"><div class="lg" style="width:64px;height:64px">'+localLogo(l)+'</div><div><h4 style="font-size:17px">'+esc(l.name)+'</h4><div class="ty">'+esc(l.type)+' · '+l.km+'</div>'+(l.clubgo?'<span class="clubgo">★ CLUB GO</span>':'')+'</div></div></div>'; });
   openPage(o+'</div>','noscroll');
 }
@@ -801,7 +840,7 @@ function notifSheet(){
   var items=[
     ['🍫','Llegó Cofler Dubai','Canjeala por 45 pasitos y contanos qué te pareció.','data-prize="cofler_dubai" data-local="arcor"'],
     ['🏆',CHALLENGES[0].t+' está muy parejo',esc(ME.team)+' lleva '+P.pct[ME.team]+'% de participación. ¡Sumá tus pasos!','data-chal="0"'],
-    PROF==='vend'?['🏪','Activá un comercio en Tokin','Ganás bonus por cada PDV que asocies.','data-open="tokin"']:['🛒','15% en tu primera compra','Canjeá el cupón de Arcor en Casa con pasitos.','data-open="aec"']];
+    PROF==='vend'?['🏪','Activá un comercio en Tokin','Ganás bonus por cada PDV que asocies.','data-open="tokin"']:['🛒','10% OFF en Arcor en Casa','Canjeá el cupón por solo 30 pasitos.','data-prize="aec" data-local="arcor"']];
   var o='<h2 style="margin-top:6px">Notificaciones</h2><div class="notifs">';
   items.forEach(function(n){ o+='<button class="notif" '+n[3]+'><span class="ni">'+n[0]+'</span><span><b>'+n[1]+'</b><small>'+n[2]+'</small></span>'+I.chev+'</button>'; });
   openSheet(o+'</div>');
@@ -812,20 +851,20 @@ function prizeSheet(key, lk){
   var o='<div class="sh-head" style="margin-top:56px"><div class="sh-img">'+thumb(p)+'</div><span class="sh-cost">'+coin(true)+' '+c+' pasitos</span></div>';
   o+='<h2>'+esc(p.name)+'</h2><div class="where"><b>'+esc(l.name)+'</b> '+esc(l.addr)+'</div>';
   if(c!==p.cost) o+='<span class="clubgo" style="margin-top:10px">★ CLUB GO · antes '+p.cost+' pasitos</span><br>';
-  o+='<span class="stock">'+I.cart+' '+p.stock+' en stock en este local</span><hr><p class="desc">'+esc(p.desc)+'</p>';
-  o+='<div class="how"><h3>Cómo canjear</h3><ol><li data-n="1">'+(p.coupon?'Canjeá y recibí tu código.':'Acercate al mostrador.')+'</li><li data-n="2">'+(p.coupon?'Usalo en arcorencasa.com al pagar.':'El comercio confirma el canje con su PIN.')+'</li></ol></div>';
+  o+='<span class="stock">'+I.cart+' '+(l.online?'Envío a todo el país':p.stock+' en stock en este local')+'</span><hr><p class="desc">'+esc(p.desc)+'</p>';
+  o+='<div class="how"><h3>Cómo canjear</h3><ol><li data-n="1">'+(l.online?'Canjeá y recibí tu código.':'Acercate al mostrador.')+'</li><li data-n="2">'+(p.coupon?'Usalo en arcorencasa.com al pagar.':l.online?'Cargalo en arcorencasa.com y te lo enviamos a tu casa.':'El comercio confirma el canje con su PIN.')+'</li></ol></div>';
   o+=enough?'<button class="btn" data-redeem="'+key+'" data-local="'+lk+'">Canjear por '+c+' pasitos</button>'
            :'<button class="btn" disabled>Te faltan '+(c-S.pasitos)+' pasitos</button><button class="btn ghost" style="margin-top:10px" data-close-sheet data-tab="home">Caminar para sumar</button>';
   openSheet(o);
 }
 function redeem(key, lk){
   var p=PRIZES[key], c=priceFor(key,lk), pin=String(Math.floor(1000+Math.random()*9000));
-  var o='<div class="center"><div class="big-ok">'+I.check+'</div><h2>¡Canje confirmado!</h2><p class="muted" style="margin-top:8px">'+(p.coupon?'Tu código de bienvenida para Arcor en Casa:':'Mostrá este código en el mostrador de '+esc(LOCALS[lk].name)+':')+'</p></div>';
-  o+='<div class="code">'+(p.coupon?'PASITO15-'+pin:pin)+'</div><p class="center muted" style="font-size:13px;margin-top:8px">Código de ejemplo · prototipo</p>';
+  var o='<div class="center"><div class="big-ok">'+I.check+'</div><h2>¡Canje confirmado!</h2><p class="muted" style="margin-top:8px">'+(LOCALS[lk].online?(p.coupon?'Tu cupón de 10% OFF para Arcor en Casa:':'Usá este código en arcorencasa.com y te lo enviamos:'):'Mostrá este código en el mostrador de '+esc(LOCALS[lk].name)+':')+'</p></div>';
+  o+='<div class="code">'+(LOCALS[lk].online?(p.coupon?'PASITO10-':'AEC-')+pin:pin)+'</div><p class="center muted" style="font-size:13px;margin-top:8px">Código de ejemplo · prototipo</p>';
   S.pasitos-=c; S.canjes.push({key:key, local:lk, cost:c, when:'hoy '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})});
   bumpPasitos(); confetti();
   if(p.lanz) o+='<button class="btn" style="margin-top:18px" data-survey="'+key+'">Contanos qué te pareció (+5 pasitos)</button>';
-  else if(PROF==='vend' && !LOCALS[lk].arcor && !S.tokinDone) o+='<button class="btn" style="margin-top:18px" data-open="tokin">¿Este comercio tiene Tokin? Asocialo</button>';
+  else if(PROF==='vend' && !LOCALS[lk].online && !S.tokinDone) o+='<button class="btn" style="margin-top:18px" data-open="tokin">¿Este comercio tiene Tokin? Asocialo</button>';
   o+='<button class="btn ghost" style="margin-top:10px" data-close-sheet>Listo</button>';
   openSheet(o);
 }
@@ -846,9 +885,9 @@ function challengeSheet(i){
   openSheet(o);
 }
 function aecSheet(){
-  var o='<div style="margin-top:6px;border-radius:22px;overflow:hidden"><img src="'+IMG.encasaBanner+'" alt="Arcor en Casa"></div><h2>Tu primera compra en Arcor en Casa</h2><div class="where">Beneficio exclusivo de Pasos que Suman</div>';
-  o+='<div class="card" style="margin-top:16px;padding:16px;display:flex;gap:14px;align-items:center"><div style="width:84px;height:44px;border-radius:10px;background:#fff;display:grid;place-items:center"><img src="'+IMG.encasa+'" alt="" style="height:40px"></div><div><b style="font-size:20px">15% OFF</b><div class="muted" style="font-size:14px">en tu primera compra · envíos a todo el país</div></div></div>';
-  o+='<button class="btn" style="margin-top:18px" data-prize="aec" data-local="arcor">Canjear cupón por '+PRIZES.aec.cost+' pasitos</button>';
+  var o='<div style="margin-top:6px;border-radius:18px;overflow:hidden"><img src="'+IMG.bMama+'" alt="Arcor en Casa"></div><h2>10% OFF en Arcor en Casa</h2><div class="where">Canjeá tus pasitos por un cupón para tu próxima compra online</div>';
+  o+='<div class="card" style="margin-top:16px;padding:16px;display:flex;gap:14px;align-items:center"><div style="width:84px;height:44px;border-radius:10px;background:#fff;display:grid;place-items:center"><img src="'+IMG.encasa+'" alt="" style="height:40px"></div><div><b style="font-size:20px">10% OFF</b><div class="muted" style="font-size:14px">por 30 pasitos · envíos a todo el país</div></div></div>';
+  o+='<button class="btn" style="margin-top:18px" data-prize="aec" data-local="arcor">Canjear por 30 pasitos</button><button class="btn ghost" style="margin-top:10px" data-local="arcor">Ver productos de Arcor en Casa</button>';
   openSheet(o);
 }
 function tokinSheet(){
@@ -972,6 +1011,7 @@ $('#enter').onclick=function(){
 };
 $('#nm').addEventListener('keydown',function(e){ if(e.key==='Enter') $('#nm').blur(); });
 </script>
+
 
 
 
