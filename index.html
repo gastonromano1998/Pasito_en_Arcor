@@ -1016,14 +1016,14 @@ function welcomeModal(){
     '<div class="md-code" id="md-code">AEC.MAMÁ</div><button class="btn" data-copy="AEC.MAMÁ">Copiar cupón</button><button class="btn ghost" style="margin-top:8px" data-modal-close>Seguir a Pasito</button></div></div>';
   m.classList.add('on');
 }
-function closeModal(){ var m=$('#modal'); if(!m.classList.contains('on')) return; m.classList.remove('on'); }
-/* Tiempos de la demo: pop-up al minuto, encuesta a los 2 minutos (con #rapido en el link: 8 y 16 segundos) */
-var FAST = location.hash==='#rapido', T_POPUP = FAST?8000:60000, T_SURVEY = FAST?16000:120000;
+function closeModal(){ var m=$('#modal'); if(!m.classList.contains('on')) return; m.classList.remove('on');
+  if(!surveyQueued){ surveyQueued=true; setTimeout(function(){ whenFree(function(){ var pend=S.canjes.filter(function(x){return x.survey;})[0]; if(!pend) return; S.surveyShown=true; surveySheet(pend.key,true); if(S.tab==='home') renderHome(); }); }, T_SURVEY); } }
+/* Tiempos de la demo: pop-up a los 7 segundos de entrar; encuesta 20 segundos después de cerrar el pop-up */
+var T_POPUP = 7000, T_SURVEY = 20000, surveyQueued = false;
 function busy(){ return $('#modal').classList.contains('on') || sheet.classList.contains('on') || pg.classList.contains('on'); }
 function whenFree(fn){ if(busy()) setTimeout(function(){ whenFree(fn); },4000); else fn(); }
 function scheduleDemo(){
   setTimeout(function(){ whenFree(welcomeModal); }, T_POPUP);
-  setTimeout(function(){ whenFree(function(){ var pend=S.canjes.filter(function(x){return x.survey;})[0]; if(!pend) return; S.surveyShown=true; surveySheet(pend.key,true); if(S.tab==='home') renderHome(); }); }, T_SURVEY);
 }
 function copyText(t){
   var ok=function(){ toast('Cupón '+t+' copiado'); };
